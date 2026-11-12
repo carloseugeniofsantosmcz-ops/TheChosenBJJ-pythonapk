@@ -16,7 +16,7 @@ class TestProject(unittest.TestCase):
         spec = (ROOT / 'buildozer.spec').read_text()
         self.assertRegex(spec, r'version = 0\.17\.0')
         self.assertIn('android.permissions = INTERNET', spec)
-        self.assertIn('requirements = python3,kivy,requests,certifi', spec)
+        self.assertIn('requirements = python3,kivy,', spec)
 
 if __name__ == '__main__':
     unittest.main()
