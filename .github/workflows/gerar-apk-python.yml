@@ -1,0 +1,74 @@
+name: Compilar The Chosen BJJ Python APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'main.py'
+      - 'config.py'
+      - 'buildozer.spec'
+      - 'tests/**'
+      - '.github/workflows/gerar-apk-python.yml'
+permissions:
+  contents: read
+jobs:
+  android-apk:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar Python de compilacao
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Testes locais antes da compilacao
+        run: |
+          python -m py_compile main.py config.py
+          python -m unittest discover -s tests -v
+      - name: Instalar pacotes nativos e Buildozer
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf automake libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo6 cmake libffi-dev libssl-dev libltdl-dev
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install 'cython==0.29.34' 'buildozer==1.5.0'
+      - name: Verificar espaço disponível
+        run: df -h .
+      - name: Mostrar versoes de compilacao
+        run: |
+          java -version
+          python --version
+          buildozer --version
+      - name: Verificar arquivos essenciais
+        run: |
+          test -s main.py
+          test -s config.py
+          test -s buildozer.spec
+          python - <<'CHECK'
+          from pathlib import Path
+          p = Path('buildozer.spec').read_text()
+          assert 'p4a.bootstrap = sdl2' in p
+          assert 'android.permissions = INTERNET' in p
+          CHECK
+      - name: Compilar APK
+        env:
+          JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+        run: |
+          set -o pipefail
+          buildozer -v android debug 2>&1 | tee compilacao.log
+          test -n "$(find bin -maxdepth 1 -name '*.apk' -print -quit)"
+      - name: Salvar log mesmo em caso de erro
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TheChosenBJJ-Log-Compilacao
+          path: compilacao.log
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Disponibilizar APK Android
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TheChosenBJJ-APK-Instalavel
+          path: bin/*.apk
+          if-no-files-found: error
+          retention-days: 30

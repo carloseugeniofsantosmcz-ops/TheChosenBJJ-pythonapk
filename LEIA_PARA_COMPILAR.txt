@@ -1,0 +1,14 @@
+THE CHOSEN BJJ - COMPILAR APK
+
+Este ZIP contém o projeto Python/Kivy e o workflow do GitHub Actions. NÃO é um APK.
+
+1. Envie este ZIP à raiz do repositório pelo Codespaces.
+2. Abra o terminal e execute (substitua o nome apenas se necessário):
+
+python3 -m zipfile -e TheChosenBJJ_Compilar_Agora.zip . && git add main.py config.py buildozer.spec tests .github/workflows/gerar-apk-python.yml && git commit -m "Compilar The Chosen BJJ Python" && git push
+
+3. Em GitHub > Actions, abra "Compilar The Chosen BJJ Python APK".
+4. Se o job ficar verde, baixe o artefato "TheChosenBJJ-APK-Instalavel".
+5. Se ficar vermelho, baixe "TheChosenBJJ-Log-Compilacao".
+
+ATENÇÃO: código ainda não foi testado em dispositivo Android e integrações financeiras/faciais não estão completas.
