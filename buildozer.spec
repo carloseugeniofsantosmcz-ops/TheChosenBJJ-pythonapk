@@ -5,7 +5,7 @@ package.domain = br.com
 source.dir = .
 source.include_exts = py,png,jpg,kv,ttf,json
 version = 0.17.0
-requirements = python3,kivy,requests,certifi
+requirements = python3,kivy,requests,certifi,charset-normalizer==3.3.2
 orientation = portrait
 fullscreen = 0
 android.permissions = INTERNET
